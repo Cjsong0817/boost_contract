@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="33.613" height="33.613" viewBox="0 0 33.613 33.613">
+  <g id="Group_29" data-name="Group 29" transform="translate(-199 -165.025)">
+    <g id="outline-account_balance_wallet-24px" transform="translate(199 169.517)">
+      <g id="Bounding_Boxes">
+        <path id="Path_2260" data-name="Path 2260" d="M0,0H29.121V29.121H0Z" fill="none"/>
+      </g>
+      <g id="Outline" transform="translate(3.64 3.64)">
+        <g id="Group_28" data-name="Group 28">
+          <path id="Path_2261" data-name="Path 2261" d="M24.841,8.193V5.427A2.434,2.434,0,0,0,22.414,3H5.427A2.426,2.426,0,0,0,3,5.427V22.414a2.426,2.426,0,0,0,2.427,2.427H22.414a2.434,2.434,0,0,0,2.427-2.427V19.648a2.428,2.428,0,0,0,1.213-2.087V10.28A2.428,2.428,0,0,0,24.841,8.193ZM23.628,10.28v7.28H15.134V10.28ZM5.427,22.414V5.427H22.414V7.854h-7.28a2.434,2.434,0,0,0-2.427,2.427v7.28a2.434,2.434,0,0,0,2.427,2.427h7.28v2.427Z" transform="translate(-3 -3)" fill="#e1c497" stroke="#97683a" stroke-width="0.3"/>
+          <g id="Group_27" data-name="Group 27" transform="translate(13.954 9.1)">
+            <circle id="Ellipse_81" data-name="Ellipse 81" cx="1.82" cy="1.82" r="1.82" fill="#e1c497" stroke="#97683a" stroke-width="0.3"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <path id="Path_912" data-name="Path 912" d="M15.711,11.12H11.12v4.59H9.59V11.12H5V9.59H9.59V5h1.53V9.59h4.59Z" transform="translate(216.752 160.175)" fill="#e1c497" stroke="#97683a" stroke-width="0.3"/>
+  </g>
+</svg>

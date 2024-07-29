@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36.865" height="40.848" viewBox="0 0 36.865 40.848">
+  <g id="Group_30" data-name="Group 30" transform="translate(-293.135 -167)">
+    <g id="baseline-credit_card-24px" transform="translate(322.152 184.029) rotate(90)">
+      <path id="Path_215" data-name="Path 215" d="M0,0H23.819V25.226H0Z" fill="none"/>
+      <path id="Path_216" data-name="Path 216" d="M16.8,0H1.867A1.852,1.852,0,0,0,.009,1.866L0,13.061a1.86,1.86,0,0,0,1.867,1.866H16.8a1.86,1.86,0,0,0,1.867-1.866V1.866A1.86,1.86,0,0,0,16.8,0Zm0,13.061H1.867v-5.6H16.8Zm0-9.329H1.867V1.866H16.8Z" transform="translate(2.575 5.15)" fill="#e1c497" stroke="#a17549" stroke-width="0.3"/>
+    </g>
+    <g id="baseline-open_in_browser-24px" transform="translate(293.285 167)">
+      <path id="Path_361" data-name="Path 361" d="M0,0H34.266V34.266H0Z" transform="translate(2.449)" fill="none"/>
+      <path id="Path_362" data-name="Path 362" d="M27.861,10.815H1.14A2.855,2.855,0,0,0-1.715,13.67v7.4A2.855,2.855,0,0,0,1.14,23.929H6.851V21.074H1.14V16.526H27.861v4.548H22.15v2.856h5.711a2.864,2.864,0,0,0,2.856-2.856v-7.4A2.855,2.855,0,0,0,27.861,10.815Z" transform="translate(1.715 4.626)" fill="#e1c497" stroke="#a17549" stroke-width="0.3"/>
+    </g>
+  </g>
+</svg>

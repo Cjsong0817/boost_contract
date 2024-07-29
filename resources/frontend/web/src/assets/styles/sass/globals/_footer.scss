@@ -1,0 +1,13 @@
+.app-footer {
+    // margin-top: 2rem;
+    background: $white;
+    padding: 0.8rem 1.25rem;
+    .footer-bottom {
+        width: 100%;
+        .logo {
+            width: 3rem;
+            height: auto;
+            margin: 4px;
+        }
+    }
+}

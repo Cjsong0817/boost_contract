@@ -1,0 +1,529 @@
+<template>
+  <div class="main-content">
+    <breadcumb :page="$t('followerUserList')" :folder="$t('insuranceManage')" />
+
+    <b-row>
+      <b-col md="12">
+        <b-card class="mb-30">
+          <b-row align-v="center">
+            <b-col md="2">
+              <b-form-group id="input-group-1" :label="$t('username')" label-for="input-1">
+                <b-form-input id="input-1" type="text" required :placeholder="$t('Enter') + $t('username')"
+                  v-model="searchUsername"></b-form-input>
+              </b-form-group>
+            </b-col>
+
+            <b-col md="3" class="mt-3 mt-md-0">
+              <b-form-group id="input-group-2" :label="$t('from')" label-for="input-2">
+                <b-form-input id="input-2" type="date" v-model="from"></b-form-input>
+              </b-form-group>
+            </b-col>
+
+            <b-col md="3" class="mt-3 mt-md-0">
+              <b-form-group id="input-group-2" :label="$t('to')" label-for="input-2">
+                <b-form-input id="input-2" type="date" v-model="to"></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col md="1" class="mt-3 mt-md-0">
+              <b-button :disabled="isLoading" variant="primary" @click="onSearch">{{ $t("search") }}</b-button>
+            </b-col>
+            <b-col md="1" class="mt-3 mt-md-0" v-if="canClear">
+              <b-button :disabled="isLoading" variant="danger" @click="onCancel">{{ $t("clear") }}</b-button>
+            </b-col>
+          </b-row>
+        </b-card>
+      </b-col>
+    </b-row>
+
+    <b-card :title="$t('followerUserList')">
+      <vue-good-table id="table" mode="remote" @on-page-change="onPageChange" @on-search="onSearch"
+        :totalRows="totalRecords" :isLoading="isLoading" :columns="columns" :search-options="{
+          enabled: false,
+          placeholder: 'Search this table',
+        }" :pagination-options="{
+  enabled: false,
+  perPageDropdownEnabled: false,
+  perPageDropdown: [10],
+  dropdownAllowAll: false,
+  rowsPerPageLabel: $t('rowPerPage'),
+  nextLabel: $t('next'),
+  prevLabel: $t('previous'),
+  mode: 'pages',
+  pageLabel: $t('page'),
+  setCurrentPage: pageNumber,
+}" styleClass="tableOne vgt-table table-striped" :selectOptions="{
+  enabled: false,
+  selectionInfoClass: 'table-alert__box',
+}" :rows="rows">
+        <!-- <div slot="table-actions" class="mb-3">
+            <b-button variant="primary" class="btn-rounded"> Add Button </b-button>
+          </div> -->
+
+        <template slot="table-row" slot-scope="props">
+
+
+          <span v-if="props.column.field == 'status'">
+            <span v-if="props.row.status == 0">
+              <b-badge href="#" variant="warning m-2">{{
+                $t("pending")
+              }}</b-badge>
+            </span>
+            <span v-else-if="props.row.status == 1">
+              <b-badge href="#" variant="primary m-2">{{
+                $t("approve")
+              }}</b-badge>
+            </span>
+            <span v-else>
+              <b-badge href="#" variant="danger m-2">{{
+                $t("reject")
+              }}</b-badge>
+            </span>
+          </span>
+          <span v-else-if="props.column.field == 'created_at'">
+            {{ props.row.created_at }}
+          </span>
+          <span v-else-if="props.column.field == 'user_group_id'">
+            <span v-if="$i18n.locale == 'en'">
+              {{ props.row.package.package_name_en }}
+            </span>
+            <span v-else>{{ props.row.package.package_name }}</span>
+          </span>
+          <span v-else-if="props.column.field == 'user_rank_id'">
+            {{ checkRank(props.row) }}
+          </span>
+          <span v-else-if="props.column.field == 'set_rank'">
+            {{ checkLowestRank(props.row.set_rank) }}
+          </span>
+        </template>
+      </vue-good-table>
+      <div class="align-items-center mobile-adjust">
+        <div v-if="totalRecords > 0" class="d-flex flex-wrap align-items-center justify-content-start mt-3">
+          <p class="text-light text-16 mr-2">{{ $t("total") }}</p>
+          <p class="text-muted text-16" style="font-weight: bold">
+            {{ totalRecords }}
+          </p>
+        </div>
+        <div v-else></div>
+        <div class="d-flex flex-wrap align-items-center justify-content-end">
+          <b-pagination class="pagi-margin pt-3" v-model="pageNumber" :total-rows="totalRecords" :per-page="10"
+            :first-text="$t('first')" :prev-text="$t('prev')" :next-text="$t('next')" :last-text="$t('last')"
+            @input="loadItems()">
+          </b-pagination>
+
+          <b-input-group class="ml-3" style="width: 160px">
+            <b-form-input v-model="pageNumber" :placeholder="$t('PageNo')"></b-form-input>
+            <b-input-group-append>
+              <b-button variant="primary" @keypress="loadItems()" @click="loadItems()" :disabled="isLoading">{{
+                $t("go")
+              }}</b-button>
+            </b-input-group-append>
+          </b-input-group>
+        </div>
+      </div>
+    </b-card>
+
+
+
+    <Dialog ref="msg"></Dialog>
+
+    <b-modal id="modal-1" size="lg" centered :title="$t('provideRemark')" hide-footer>
+      <b-form class="mx-5" v-on:submit.prevent="rejectW">
+        <b-row align-h="center">
+          <b-col md="10 mb-30">
+            <div class="form-group row">
+              <label for="remark" class="col-sm-2 col-form-label">{{
+                $t("remark")
+              }}</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="remark" v-model="remark" required />
+              </div>
+            </div>
+            <div class="form-group row justify-content-end">
+              <div class="col-sm-12">
+                <div class="mt-4 float-right">
+                  <b-button :disabled="isLoading" type="submit" class="m-1" variant="primary">{{
+                    $t("submit")
+                  }}</b-button>
+                </div>
+              </div>
+            </div>
+          </b-col>
+        </b-row>
+      </b-form>
+    </b-modal>
+  </div>
+</template>
+
+<script>
+import {
+  followerUserList,
+} from "../../../system/api/api";
+import { handleError } from "../../../system/handleRes";
+import Dialog from "../../../components/dialog.vue";
+import { mapGetters } from "vuex";
+export default {
+  computed: {
+    ...mapGetters(["lang"]),
+    walletLabel() {
+      return [
+        {
+          label: this.$t("id"),
+          text: "id",
+          field: "id",
+          thClass: "gull-th-class",
+          value: "id",
+          sortable: false,
+        },
+        {
+          label: this.$t("username"),
+          text: "username",
+          field: "username",
+          thClass: "gull-th-class",
+          value: "username",
+          sortable: false,
+        },
+        {
+          label: this.$t("amount"),
+          text: "amount",
+          field: "amount",
+          thClass: "gull-th-class",
+          value: "amount",
+          sortable: false,
+        },
+        {
+          label: this.$t("opened_rate"),
+          text: "opened_rate",
+          field: "opened_rate",
+          thClass: "gull-th-class",
+          value: "opened_rate",
+          sortable: false,
+        },
+        {
+          label: this.$t("closed_rate"),
+          text: "closed_rate",
+          field: "closed_rate",
+          thClass: "gull-th-class",
+          value: "closed_rate",
+          sortable: false,
+        },
+        {
+          label: this.$t("pl"),
+          text: "pl",
+          field: "pl",
+          thClass: "gull-th-class",
+          value: "pl",
+          sortable: false,
+        },
+        {
+          label: this.$t("trade_type"),
+          text: "trade_type",
+          field: "trade_type",
+          thClass: "gull-th-class",
+          value: "trade_type",
+          sortable: false,
+        },
+        {
+          label: this.$t("opened_date"),
+          text: "opened_date",
+          field: "opened_date",
+          thClass: "gull-th-class",
+          value: "opened_date",
+          sortable: false,
+        },
+        {
+          label: this.$t("closed_date"),
+          text: "closed_date",
+          field: "closed_date",
+          thClass: "gull-th-class",
+          value: "closed_date",
+          sortable: false,
+        },
+        {
+          label: this.$t("asset"),
+          text: "asset",
+          field: "asset",
+          thClass: "gull-th-class",
+          value: "asset",
+          sortable: false,
+        },
+        {
+          label: this.$t("created_at"),
+          text: "created_at",
+          field: "created_at",
+          thClass: "gull-th-class",
+          value: "created_at",
+          sortable: false,
+        },
+      ];
+    },
+
+    columns() {
+      return [
+        {
+          label: this.$t("user_id"),
+          text: "id",
+          field: "id",
+          thClass: "gull-th-class",
+          value: "id",
+          sortable: false,
+        },
+        {
+          label: this.$t("username"),
+          text: "username",
+          field: "username",
+          thClass: "gull-th-class",
+          value: "username",
+          sortable: false,
+        },
+        {
+          label: this.$t("fullname"),
+          text: "fullname",
+          field: "fullname",
+          thClass: "gull-th-class",
+          value: "fullname",
+          sortable: false,
+        },
+        {
+          label: this.$t("email"),
+          text: "email",
+          field: "email",
+          thClass: "gull-th-class",
+          value: "email",
+          sortable: false,
+        },
+        {
+          label: this.$t("master_trader"),
+          text: "follow_trader",
+          field: "follow_trader",
+          thClass: "gull-th-class",
+          value: "follow_trader",
+          sortable: false,
+        },
+        {
+          label: this.$t("package"),
+          text: "user_group_id",
+          field: "user_group_id",
+          thClass: "gull-th-class",
+          value: "user_group_id",
+          sortable: false,
+        },
+        {
+          label: this.$t("point1"),
+          text: "point1",
+          field: "point1",
+          thClass: "gull-th-class",
+          value: "point1",
+          sortable: false,
+        },
+        {
+          label: this.$t("point2"),
+          text: "point2",
+          field: "point2",
+          thClass: "gull-th-class",
+          value: "point2",
+          sortable: false,
+        },
+        {
+          label: this.$t("point3"),
+          text: "point3",
+          field: "point3",
+          thClass: "gull-th-class",
+          value: "point3",
+          sortable: false,
+        },
+        {
+          label: this.$t("user_rank"),
+          text: "user_rank_id",
+          field: "user_rank_id",
+          thClass: "gull-th-class",
+          value: "user_rank_id",
+          sortable: false,
+        },
+        // {
+        //   label: this.$t("lowest_rank"),
+        //   text: "set_rank",
+        //   field: "set_rank",
+        //   thClass: "gull-th-class",
+        //   value: "set_rank",
+        //   sortable: false,
+        // },
+        {
+          label: this.$t("registerDate"),
+          text: "created_at",
+          field: "created_at",
+          thClass: "gull-th-class",
+          value: "created_at",
+          tdClass: "dateWidth",
+          sortable: false,
+        },
+      ];
+    },
+  },
+  components: {
+    Dialog,
+  },
+  data() {
+    return {
+      selectedId: null,
+      isLoading: false,
+      canClear: false,
+      totalRecords: 0,
+      pageNumber: 1,
+      message: "",
+      rows: [],
+      username: "",
+      remark: "",
+      searchUsername: "",
+      searchUsernameWallet: "",
+      walletPageNumber: 1,
+      totalWalletRecords: 0,
+      from: "",
+      to: "",
+      canShow: false,
+      tabIndex: 0,
+      walletRows: [],
+    };
+  },
+  props: ["success"],
+  methods: {
+    processDate(rawDate) {
+      var d = new Date(rawDate);
+      var dMinute = d.getMinutes();
+      var dHour = d.getHours();
+      if (dMinute.toString().length == 1) {
+        dMinute = "0" + dMinute;
+      }
+      if (dHour.toString().length == 1) {
+        dHour = "0" + dHour;
+      }
+      var date =
+        d.getFullYear() +
+        "-" +
+        (d.getMonth() + 1) +
+        "-" +
+        d.getDate() +
+        " " +
+        dHour +
+        ":" +
+        dMinute;
+      return date;
+    },
+    checkRank(user) {
+      if (user.user_group_id == 1) {
+        return this.$t("nonMember");
+      } else {
+        if (this.$i18n.locale == "en") {
+          return user.rank.rank_name_en;
+        } else {
+          return user.rank.rank_name;
+        }
+      }
+    },
+    checkLowestRank(userID) {
+      for (let i = 0; i < this.user_rank_idOptions.length; i++) {
+        if (this.user_rank_idOptions[i].value == userID) {
+          return this.user_rank_idOptions[i].text;
+        }
+
+      }
+    },
+    onPageChange(params) {
+      this.pageNumber = params.currentPage;
+      this.loadItems();
+      var container = this.$el.querySelector("#table");
+      var top = container.offsetTop;
+
+      window.scrollTo(0, top);
+    },
+    onSearch() {
+      this.pageNumber = 1;
+      if (this.searchUsername != "" || this.from != "" || this.to != "") {
+        this.canClear = true;
+      }
+      this.loadItems();
+    },
+    onCancel() {
+      this.searchUsername = "";
+      this.from = "";
+      this.to = "";
+      this.canClear = false;
+      this.loadItems();
+    },
+    showModal(row, action) {
+      this.selectedId = row.id;
+      this.selectedAction = action;
+    },
+    showModalApprove(row) {
+      this.$swal({
+        title: this.$t("are_you_sure_to_approve"),
+        text: this.$t("double_confirm"),
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: this.$t("cancel"),
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: this.$t("approve")
+      }).then(result => {
+        if (result.value) {
+          console.log(result.value);
+          this.approved(row);
+        }
+      });
+    },
+    clearData() {
+      this.canEdit = false;
+      var self = this;
+      self.selectedId = null;
+      self.username = "";
+      self.remark = "";
+    },
+    loadItems() {
+      var result = followerUserList(
+        this.pageNumber,
+        this.from,
+        this.to,
+        this.searchUsername,
+        'BOT'
+      );
+      var self = this;
+      this.isLoading = true;
+      result
+        .then(function (value) {
+          console.log(value);
+          var dataList = value.data.data.user.data;
+          self.rows = dataList;
+          self.totalRecords = value.data.data.user.total;
+          self.isLoading = false;
+        })
+        .catch(function (error) {
+          self.$refs.msg.makeToast("warning", self.$t(handleError(error)));
+        });
+    },
+  },
+  created() {
+    this.loadItems();
+  },
+};
+</script>
+
+<style>
+.upload-hint {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-style: dotted;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.hiddenClass {
+  pointer-events: none;
+  display: none;
+}
+
+.txidWidth {
+  max-width: 220px;
+}
+</style>
