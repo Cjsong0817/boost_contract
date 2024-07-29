@@ -17,7 +17,7 @@ class Web3Service
         $provider = new HttpProvider(new HttpRequestManager('https://cardona-zkevm.polygonscan.com/', 2442));
         $this->web3 = new Web3($provider);
 
-        $abi = json_decode(file_get_contents(storage_path('Contact/BoostProtocol.json')), true);
+        $abi = json_decode(file_get_contents(storage_path('contact/BoostProtocol.json')), true);
         $this->contract = new Contract($provider, $abi);
     }
 
