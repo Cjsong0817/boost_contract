@@ -17,7 +17,7 @@ class ContractController extends Controller
 
     public function getContractData()
     {
-        $result = $this->web3Service->callContractFunction('totalUsdt');
+        $result = $this->web3Service->callFunction('totalUsdt');
         return response()->json($result);
     }
 
