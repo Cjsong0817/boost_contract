@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\APIController;
-use App\Http\Controllers\Api\CronjobController;
+use App\Http\Controllers\Api\ContractController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,65 +16,9 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::group(['middleware' => 'guest:api'], function () {
-    Route::group(['prefix' => 'news'], function () {
-        Route::get('banner-list', [NewsController::class, 'bannerList']);
-        Route::get('news-list', [NewsController::class, 'newsList']);
-    });
-    Route::group(['prefix' => 'cronjob'], function () {
 
-        Route::get('checkBalance', [Web3Controller::class, 'checkBalance']);
-        Route::get('generateAddress', [Web3Controller::class, 'generateAddress']);
-        Route::post('heavytest', [RobortController::class, 'heavytest']);
-        Route::get('test', [APIController::class, 'test']);
-        Route::get('CheckRank', [CronjobController::class, 'CheckRank']);
-        Route::get('checkBTCprice', [CronjobController::class, 'checkBTCprice']);
-        Route::get('introduce', [CronjobController::class, 'introduce']);
-        Route::get('jiedian', [CronjobController::class, 'jiedian']);
-        // Route::get('RunMatchingBonus', [CronjobController::class, 'RunMatchingBonus']);
-        Route::get('RunRoiBonus', [CronjobController::class, 'RunRoiBonus']);
-        Route::get('RunRankBonus', [CronjobController::class, 'RunRankBonus']);
-        Route::get('releaseBonus', [CronjobController::class, 'releaseBonus']);
-        Route::get('SetSite', [CronjobController::class, 'SetSite']);
-        Route::get('dairlyJob', [CronjobController::class, 'dairlyJob']);
-        Route::get('dairlyJobrank', [CronjobController::class, 'dairlyJobrank']);
-        //Route::get('RunDynamicBonus', [CronjobController::class, 'RunDynamicBonus']);
-        //    Route::get('sponsorBonus', [CronjobController::class, 'sponsorBonus']);
-        // Route::get('CheckRank', 'CronjobController@CheckRank');
-        // Route::get('RunBonus', 'CronjobController@RunBonus');
-        // Route::get('RunDynamic', 'CronjobController@RunDynamic');
-    });
-    Route::group(['prefix' => 'third-party'], function () {
-        Route::any('reload-respond', [ThirdPartyController::class, 'reloadRespond']);
-        Route::any('withdraw-respond', [ThirdPartyController::class, 'withdrawRespond']);
-        Route::any('grouping-respond', [ThirdPartyController::class, 'groupingRespond']);
-        Route::any('deposit', [ThirdPartyController::class, 'deposit']);
-        Route::any('import-bet-record', [ThirdPartyController::class, 'importBetRecord']);
-        Route::any('import-claim-record', [ThirdPartyController::class, 'importClaimRecord']);
-    });
-
-    Route::group(['prefix' => 'staking'], function () {
-        Route::get('getPackageType', [StakingController::class, 'getPackageType']);
-
-    });
-
-    Route::group(['prefix' => 'global'], function () {
-        Route::post('add_device_token', [GlobalAPIController::class, 'add_device_token']);
-        Route::post('usernameOTP', [GlobalAPIController::class, 'usernameOTP']);
-        Route::get('checkUsernameOtp', [GlobalAPIController::class, 'checkUsernameOtp']);
-        Route::post('sent-otp', [GlobalAPIController::class, 'sentOTP']);
-        Route::get('check-otp', [GlobalAPIController::class, 'checkOTP']);
-        Route::get('country_list', [GlobalAPIController::class, 'country_list']);
-        Route::get('lookup', [GlobalAPIController::class, 'lookup']);
-        Route::post('contactUs', [GlobalAPIController::class, 'contactUs']);
-    });
-    Route::group(['prefix' => 'auth'], function () {
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('signup', [AuthController::class, 'signup']);
-        Route::post('logout', [AuthController::class, 'logout']);
-        Route::post('reset-password', [AuthController::class, 'resetPassword']);
-        Route::post('checkRefAddress', [AuthController::class, 'checkRefAddress']);
-        Route::post('walletLogin', [AuthController::class, 'walletLogin']);
-    });
+    Route::get('/contract-data', [ContractController::class, 'getContractData']);
+    Route::post('/send-transaction', [ContractController::class, 'sendTransaction']);
 
 });
 // Protected routes
