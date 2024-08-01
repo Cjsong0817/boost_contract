@@ -17,13 +17,17 @@ class ContractController extends Controller
 
     public function getContractData()
     {
-        $result = $this->web3Service->callFunction('totalUsdt');
-        return response()->json($result);
+        //totalPledge = 总质押
+        //getPrice = boost value
+        $data = [1000000];
+        $result = $this->web3Service->callFunction('getuseraddr', $data);
+        return $result;
     }
 
     public function sendTransaction(Request $request)
     {
-        $result = $this->web3Service->sendTransaction('yourFunctionName', [$request->param1, $request->param2], 'your_wallet_address', 'your_private_key');
+        $data = [1000000]; //[$request->param1, $request->param2]
+        $result = $this->web3Service->sendTransaction('create', $data, 'your_wallet_address', 'your_private_key');
         return response()->json($result);
     }
 }
