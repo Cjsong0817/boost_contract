@@ -55,8 +55,12 @@ class Web3Service
     public function sendTransaction($functionName = 'systemPledge', $params = [])
     {
         $functionName = 'systemPledge';
-        $params = [231, Utils::toWei('2000', 'ether')];
+        $ether = (string) 100;
+        $wei = Utils::toWei($ether, 'ether');
 
+        $params = [1000000, $wei]; // 示例数据
+        $data = $this->getData($method, $params);
+        dump($data);exit;
         $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
 
         $this->contract->at($contractAddress)->send(
@@ -79,6 +83,35 @@ class Web3Service
             }
         );
 
+    }
+    public function getData($method, $params)
+    {
+        $functions = [];
+        foreach ($this->client->getAbi() as $item) {
+            if ($item['type'] == 'function' && $item['name'] == $method) {
+                $functions[] = $item;
+            }
+        }
+        $data = "";
+        $functionName = "";
+        foreach ($functions as $function) {
+            if (count($params) !== count($function['inputs'])) {
+                continue;
+            }
+            try {
+                $data = $this->client->getEthabi()->encodeParameters($function, $params);
+                $functionName = Utils::jsonMethodToString($function);
+            } catch (InvalidArgumentException $e) {
+                continue;
+            }
+            break;
+        }
+        if (empty($data) || empty($functionName)) {
+            throw new InvalidArgumentException('Please make sure you have put all function params and callback.');
+        }
+        $functionSignature = $this->client->getEthabi()->encodeFunctionSignature($functionName);
+        $functionData = Utils::stripZero($functionSignature) . Utils::stripZero($data);
+        return "0x" . $functionData;
     }
     public function sendTransactionbak($functionName = 'systemPledge', $params = [])
     {
