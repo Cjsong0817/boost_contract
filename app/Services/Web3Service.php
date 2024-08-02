@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use InvalidArgumentException;
 use Web3\Contract;
 use Web3\Providers\HttpProvider;
 use Web3\RequestManagers\HttpRequestManager;
+use Web3p\EthereumTx\Transaction as Tx;
 use Web3\Utils;
 use Web3\Web3;
 
@@ -59,8 +61,29 @@ class Web3Service
         $wei = Utils::toWei($ether, 'ether');
 
         $params = [1000000, $wei]; // 示例数据
-        $data = $this->getData($functionName, $params);
-        dump($data);exit;
+        $data = $this->getData($$functionName, $params);
+        
+        dump($data);
+        $cb = new Callback();
+        $cb1 = new Callback();
+        $from = $this->owner_address;
+        $this->client->getEth()->getTransactionCount($from, 'pending', $cb);
+        $trans = [
+            "from"  => $from,
+            "gas" => "0x76c0", // 30400
+            "gasPrice" => "0x9184e72a000", // 10000000000000
+            "data" => $data,
+            "nonce" =>"0x" . $this->web3->getUtils()->toHex($cb->result->toString()),
+            "chainId"=> 97
+        ]
+        // $trans['nonce'] = "0x" . $this->web3->getUtils()->toHex($cb->result->toString());
+        // $trans['chainId'] = $this->chain['chain_id'];
+        $transaction = new Tx($trans);
+        $signTransaction = $transaction->sign($this->privateKey);
+        sleep(2);
+        $this->contract->getEth()->sendRawTransaction("0x" . $signTransaction, $cb1);
+        dump($cb1->result);
+        exit;
         $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
 
         $this->contract->at($contractAddress)->send(
@@ -84,10 +107,10 @@ class Web3Service
         );
 
     }
-    protected function getData($method, $params)
+    public function getData($method, $params)
     {
         $functions = [];
-        foreach ($this->client->getAbi() as $item) {
+        foreach ($this->contract->getAbi() as $item) {
             if ($item['type'] == 'function' && $item['name'] == $method) {
                 $functions[] = $item;
             }
@@ -99,7 +122,7 @@ class Web3Service
                 continue;
             }
             try {
-                $data = $this->client->getEthabi()->encodeParameters($function, $params);
+                $data = $this->contract->getEthabi()->encodeParameters($function, $params);
                 $functionName = Utils::jsonMethodToString($function);
             } catch (InvalidArgumentException $e) {
                 continue;
@@ -109,7 +132,7 @@ class Web3Service
         if (empty($data) || empty($functionName)) {
             throw new InvalidArgumentException('Please make sure you have put all function params and callback.');
         }
-        $functionSignature = $this->client->getEthabi()->encodeFunctionSignature($functionName);
+        $functionSignature = $this->contract->getEthabi()->encodeFunctionSignature($functionName);
         $functionData = Utils::stripZero($functionSignature) . Utils::stripZero($data);
         return "0x" . $functionData;
     }
@@ -137,4 +160,22 @@ class Web3Service
         });
     }
 
+}
+
+class Callback
+{
+
+    public $error = null;
+
+    public $result = null;
+
+    function __invoke($error, $result)
+    {
+        if ($error) {
+            $this->error = $error;
+        } else {
+            $this->error = null;
+        };
+        $this->result = $result;
+    }
 }
