@@ -27,39 +27,71 @@ class Web3Service
         $this->contract = new Contract($provider, $abi['abi']);
     }
 
-    public function callFunction($functionName, $params = [])
+    public function callFunction($functionName, $params)
     {
+        var_dump($params);
+        $respond['data'] = null;
         $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
-        $this->contract->at($contractAddress)->call($functionName, $params, function ($err, $result) use ($functionName) {
-            if ($err !== null) {
 
+        $this->contract->at($contractAddress)->call($functionName, $params, function ($err, $result) use ($functionName, &$respond) {
+            if ($err !== null) {
                 throw new \Exception($err->getMessage());
             }
-            dump($result);
-            $respond['data'] = null;
-            if ($functionName == 'getPrice') {
 
+            if ($functionName == 'getPrice') {
                 $bigInteger = $result[0];
                 $weiValue = $bigInteger->toString();
-
                 $etherArray = Utils::fromWei($weiValue, 'ether');
-
                 $integerPart = $etherArray[0]->toString();
                 $decimalPart = $etherArray[1]->toString();
                 $ether = $integerPart . '.' . str_pad($decimalPart, 18, '0', STR_PAD_LEFT);
                 $respond['data'] = $ether;
+            } elseif ($functionName == 'getUserAddr') {
+                $respond['data'] = $result['account'];
             }
-
-            //  $ether = Utils::fromWei($wei, 'ether');
-            return $respond;
         });
+        return $respond;
     }
-
-    public function sendTransaction($functionName, $params = [])
+    public function sendTransaction($functionName = 'systemPledge', $params = [])
     {
+        $functionName = 'systemPledge';
+        $params = [231, Utils::toWei('2000', 'ether')];
+
         $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
 
-        $this->contract->at($contractAddress)->send($functionName, $params, [
+        $this->contract->at($contractAddress)->send(
+            $functionName,
+            $params,
+            [
+                'from' => $this->owner_address,
+                'gas' => '0x76c0', // 30400
+                'gasPrice' => '0x9184e72a000', // 10000000000000
+            ],
+            $this->privateKey,
+            function ($err, $transaction) {
+                if ($err !== null) {
+                    throw new \Exception($err->getMessage());
+                }
+
+                return response()->json([
+                    'transaction' => $transaction,
+                ]);
+            }
+        );
+
+    }
+    public function sendTransactionbak($functionName = 'systemPledge', $params = [])
+    {
+        // 将 Ether 转换为 Wei
+        $ether = (string) 100;
+        $wei = Utils::toWei($ether, 'ether');
+
+        // 确保参数数组包含必要的参数
+        $data = [1000000, $wei]; // 示例数据
+
+        $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
+
+        $this->contract->at($contractAddress)->send($functionName, $data, [
             'from' => $this->owner_address,
             'gas' => '0x76c0', // 30400
             'gasPrice' => '0x9184e72a000', // 10000000000000
@@ -71,4 +103,5 @@ class Web3Service
             return $transaction;
         });
     }
+
 }

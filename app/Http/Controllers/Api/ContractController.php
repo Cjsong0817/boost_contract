@@ -18,16 +18,33 @@ class ContractController extends Controller
     public function getContractData()
     {
         //totalPledge = 总质押
-        //getPrice = boost value
-        $data = [1000000];
-        $result = $this->web3Service->callFunction('getuseraddr', $data);
+
+        $data = '238';
+        $result = $this->web3Service->callFunction('getUserAddr', $data);
+        dump($result);
         return $result;
     }
-
+    public function getTotalPledge()
+    {
+        //getPrice = boost value
+        $data = [];
+        $result = $this->web3Service->callFunction('totalPledge', $data);
+    }
+    public function getUserAddress()
+    {
+        $data = '238';
+        $result = $this->web3Service->callFunction('getUserAddr', $data);
+    }
+    public function getMarketPrice()
+    {
+        //getPrice = boost value
+        $data = [];
+        $result = $this->web3Service->callFunction('getPrice', $data);
+    }
     public function sendTransaction(Request $request)
     {
         $data = [1000000]; //[$request->param1, $request->param2]
-        $result = $this->web3Service->sendTransaction('create', $data, 'your_wallet_address', 'your_private_key');
+        $result = $this->web3Service->sendTransaction('systemPledge', $data);
         return response()->json($result);
     }
 }
