@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'guest:api'], function () {
 
     Route::get('/contract-data', [ContractController::class, 'getContractData']);
-    Route::post('/send-transaction', [ContractController::class, 'sendTransaction']);
+    Route::get('/send-transaction', [ContractController::class, 'sendTransaction']);
 
 });
 // Protected routes
