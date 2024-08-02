@@ -59,7 +59,7 @@ class Web3Service
         $wei = Utils::toWei($ether, 'ether');
 
         $params = [1000000, $wei]; // 示例数据
-        $data = $this->getData($method, $params);
+        $data = $this->getData($functionName, $params);
         dump($data);exit;
         $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
 
@@ -84,7 +84,7 @@ class Web3Service
         );
 
     }
-    public function getData($method, $params)
+    protected function getData($method, $params)
     {
         $functions = [];
         foreach ($this->client->getAbi() as $item) {
