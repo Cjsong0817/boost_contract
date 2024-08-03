@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use InvalidArgumentException;
+use Web3p\EthereumTx\Transaction as Tx;
 use Web3\Contract;
 use Web3\Providers\HttpProvider;
 use Web3\RequestManagers\HttpRequestManager;
-use Web3p\EthereumTx\Transaction as Tx;
 use Web3\Utils;
 use Web3\Web3;
 
@@ -22,7 +22,7 @@ class Web3Service
         $this->owner_address = '0xfc6a4d842150b9375148662b9B5DD5874d50982F';
         $this->privateKey = '44b1c34b043d9870a140765e15c4acc8cad3e21ca291396ca7e4d217300a4dac';
 
-        $provider = new HttpProvider(new HttpRequestManager('https://etherscan.cardona.zkevm-rpc.com/', 2442));
+        $provider = new HttpProvider(new HttpRequestManager('https://etherscan.cardona.zkevm-rpc.com/'), 2442);
         $this->web3 = new Web3($provider);
 
         $abi = json_decode(file_get_contents(storage_path('contract/BoostProtocol.json')), true);
@@ -56,35 +56,47 @@ class Web3Service
     }
     public function sendTransaction($functionName = 'systemPledge', $params = [])
     {
+        $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
         $functionName = 'systemPledge';
         $ether = (string) 100;
         $wei = Utils::toWei($ether, 'ether');
-
+        $this->contract->at($contractAddress);
         $params = [1000000, $wei]; // 示例数据
-        $data = $this->getData($$functionName, $params);
-        
+        $data = $this->getData($functionName, $params);
+
         dump($data);
         $cb = new Callback();
         $cb1 = new Callback();
         $from = $this->owner_address;
-        $this->client->getEth()->getTransactionCount($from, 'pending', $cb);
+        $this->contract->getEth()->getTransactionCount($from, 'pending', $cb);
         $trans = [
-            "from"  => $from,
-            "gas" => "0x76c0", // 30400
-            "gasPrice" => "0x9184e72a000", // 10000000000000
+            "from" => $from,
+            "to" => $contractAddress,
+            "gas" => "0x" . Utils::toHex("1000000"), // 30400
+            "gasPrice" => "0x" . Utils::toHex(Utils::toWei("4.5", "Gwei")), // 10000000000000
+            "value" => "0x0",
             "data" => $data,
-            "nonce" =>"0x" . $this->web3->getUtils()->toHex($cb->result->toString()),
-            "chainId"=> 97
-        ]
+            "nonce" => "0x" . $this->web3->getUtils()->toHex($cb->result->toString()),
+            "chainId" => 2442,
+        ];
         // $trans['nonce'] = "0x" . $this->web3->getUtils()->toHex($cb->result->toString());
         // $trans['chainId'] = $this->chain['chain_id'];
+        print_r($trans);
         $transaction = new Tx($trans);
         $signTransaction = $transaction->sign($this->privateKey);
+        echo "\r\n $signTransaction \r\n";
         sleep(2);
-        $this->contract->getEth()->sendRawTransaction("0x" . $signTransaction, $cb1);
-        dump($cb1->result);
+        try {
+            $this->contract->at($contractAddress)->getEth()->sendRawTransaction("0x" . $signTransaction, $cb1);
+            echo "TxID: $cb1->result \r\n";
+
+            dump($this->contract);
+            dump($cb1);
+            echo "Transction Hash: \$cb1->result > " . $cb1->result . "\r\n";
+        } catch (Exception $e) {
+            dump($e->getMessage());
+        }
         exit;
-        $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
 
         $this->contract->at($contractAddress)->send(
             $functionName,
@@ -169,7 +181,7 @@ class Callback
 
     public $result = null;
 
-    function __invoke($error, $result)
+    public function __invoke($error, $result)
     {
         if ($error) {
             $this->error = $error;

@@ -18,7 +18,8 @@
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
         "nirvana-labs/ethers-php": "dev-master",
-        "tymon/jwt-auth": "^1.0"
+        "tymon/jwt-auth": "^1.0",
+        "web3p/ethereum-util": "^0.1.4"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
