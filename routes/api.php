@@ -19,7 +19,7 @@ Route::group(['middleware' => 'guest:api'], function () {
 
     Route::get('/contract-data', [ContractController::class, 'getContractData']);
     Route::get('/send-transaction', [ContractController::class, 'sendTransaction']);
-    Route::get('/checkTransaction/{txHash}', [TransactionController::class, 'checkTransactionStatus']);
+    Route::get('/checkTransaction/{txHash}', [ContractController::class, 'checkTransactionStatus']);
 });
 // Protected routes
 Route::middleware(['jwt.auth', 'preventDuplicateSubmissions'])->group(function () {
