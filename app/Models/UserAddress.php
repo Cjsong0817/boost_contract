@@ -6,25 +6,12 @@ use App\Models\User;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 
-class StaticBonus extends Model
+class UserAddress extends Model
 {
-    protected $table = 'static_bonus';
-
+    protected $table = 'user_address';
     protected $fillable = [
-        'user_id',
-        'founds', 'wallet1', 'wallet2', 'wallet3',
-        'current',
-        'detail',
-        'detailen',
-        'detailvn',
-        'detailin',
-        'detailth',
-        'share',
-        'dis',
-        'from_user',
-        'system',
+        'user_id', 'wallet_type', 'address', 'hexAddress', 'privateKey',
     ];
-
     protected $appends = [
         'user',
     ];
@@ -42,4 +29,5 @@ class StaticBonus extends Model
         return $user ? $user : null;
 
     }
+
 }

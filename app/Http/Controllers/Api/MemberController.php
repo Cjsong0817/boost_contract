@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserAddress;
 use App\Services\Web3Service;
 use Illuminate\Http\Request;
 
-class ContractController extends Controller
+class MemberController extends Controller
 {
     protected $web3Service;
 
@@ -45,17 +44,8 @@ class ContractController extends Controller
     }
     public function getUserAddress()
     {
-        $user = auth()->user();
-        $data = $user->id;
+        $data = '238';
         $result = $this->web3Service->callFunction('getUserAddr', $data);
-        if (isset($result['data']) && $result['data'] != null && $user->id) {
-
-            UserAddress::updateOrCreate(
-                ['user_id' => $user->id],
-                ['wallet_type' => 'polygon', 'address' => $result['data']]
-            );
-
-        }
     }
     public function getMarketPrice()
     {
