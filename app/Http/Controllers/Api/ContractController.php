@@ -14,7 +14,18 @@ class ContractController extends Controller
     {
         $this->web3Service = $web3Service;
     }
+    public function checkTransactionStatus($txHash)
+    {
+        // Node.js 脚本的路径
+        $nodeScript = base_path('node_scripts/web3Listener.js');
 
+        // 执行 Node.js 脚本并传递交易哈希
+        $command = "node $nodeScript $txHash";
+        $output = shell_exec($command);
+
+        // 返回输出到前端
+        return response()->json(['output' => $output]);
+    }
     public function getContractData()
     {
         //totalPledge = 总质押
@@ -24,6 +35,7 @@ class ContractController extends Controller
         dump($result);
         return $result;
     }
+
     public function getTotalPledge()
     {
         //getPrice = boost value
