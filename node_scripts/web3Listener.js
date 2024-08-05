@@ -826,7 +826,20 @@ async function checkTransactionStatus(txHash) {
                 // console.log('Log could not be parsed by this contract:', log);
             }
         });
-        console.log(JSON.stringify(args[3].toNumber()));
+        var formattedArgs = {
+            address: '',
+            userid: '',
+            pledgeAmt: '',
+            mintAmt: '',
+            uBalance: '',
+            bBalance: '',
+        };
+
+        Object.entries(formattedArgs).forEach(([key, value], index) => {
+            formattedArgs[key] = (index != 0) ? args[index].toString() : args[index];
+        });
+
+        console.log(JSON.stringify(formattedArgs));
     } catch (error) {
         console.error('Error fetching transaction receipt:', error);
     }
