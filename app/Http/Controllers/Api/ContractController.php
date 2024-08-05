@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserAddress;
+use App\Models\UserInvest;
 use App\Services\Web3Service;
 use Illuminate\Http\Request;
 
