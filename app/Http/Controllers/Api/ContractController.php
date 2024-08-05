@@ -111,7 +111,8 @@ class ContractController extends Controller
 
             $result = $this->web3Service->sendTransaction('systemPledge', $sent);
             if ($result['status']) {
-                $update['tx_id'] = $respond['data'];
+                $update['tx_id'] = $result['data'];
+                $update['status'] = 1;
                 UserInvest::where('id', $all[$i]->id)->update($update);
             }
         }
