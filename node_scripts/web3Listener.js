@@ -838,6 +838,7 @@ async function checkTransactionStatus(txHash) {
         Object.entries(formattedArgs).forEach(([key, value], index) => {
             formattedArgs[key] = (index != 0) ? args[index].toString() : args[index];
         });
+        // dump(JSON.stringify(formattedArgs));
 
         console.log(JSON.stringify(formattedArgs));
     } catch (error) {
