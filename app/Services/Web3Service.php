@@ -73,12 +73,12 @@ class Web3Service
     public function sendTransaction($functionName = 'systemPledge', $params = [])
     {
         $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
-        $functionName = 'systemPledge';
-        $ether = (string) 100;
+
+        $ether = (string) $params['amount'];
         $wei = Utils::toWei($ether, 'ether');
         $this->contract->at($contractAddress);
-        $params = [1000000, $wei]; // 示例数据
-        $data = $this->getData($functionName, $params);
+        $sent = [$params['user_id'], $wei]; // 示例数据
+        $data = $this->getData($functionName, $sent);
 
         dump($data);
         $cb = new Callback();
@@ -97,13 +97,18 @@ class Web3Service
         ];
         // $trans['nonce'] = "0x" . $this->web3->getUtils()->toHex($cb->result->toString());
         // $trans['chainId'] = $this->chain['chain_id'];
+        $respond['status'] = false;
+        $respond['data'] = null;
         print_r($trans);
         $transaction = new Tx($trans);
         $signTransaction = $transaction->sign($this->privateKey);
         echo "\r\n $signTransaction \r\n";
         sleep(2);
         try {
+
             $this->contract->at($contractAddress)->getEth()->sendRawTransaction("0x" . $signTransaction, $cb1);
+            $respond['status'] = true;
+            $respond['data'] = $cb1->result;
             echo "TxID: $cb1->result \r\n";
 
             dump($this->contract);
@@ -112,27 +117,8 @@ class Web3Service
         } catch (Exception $e) {
             dump($e->getMessage());
         }
+        return $respond;
         exit;
-
-        $this->contract->at($contractAddress)->send(
-            $functionName,
-            $params,
-            [
-                'from' => $this->owner_address,
-                'gas' => '0x76c0', // 30400
-                'gasPrice' => '0x9184e72a000', // 10000000000000
-            ],
-            $this->privateKey,
-            function ($err, $transaction) {
-                if ($err !== null) {
-                    throw new \Exception($err->getMessage());
-                }
-
-                return response()->json([
-                    'transaction' => $transaction,
-                ]);
-            }
-        );
 
     }
     public function getData($method, $params)

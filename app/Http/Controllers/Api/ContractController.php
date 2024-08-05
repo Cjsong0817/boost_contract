@@ -101,6 +101,21 @@ class ContractController extends Controller
             $this->set_key('BOOST_PRICE', $getPrice['data']);
         }
     }
+    public function systemPledge(Request $request)
+    {
+        $all = UserInvest::where('tx_id', null)->get();
+        for ($i = 0; $i < count($all); $i++) {
+            $sent['user_id'] = $all[$i]->user_id;
+            $sent['amount'] = $all[$i]->price;
+
+            $result = $this->web3Service->sendTransaction('systemPledge', $sent);
+            if ($result['status']) {
+                $update['tx_id'] = $respond['data'];
+                UserInvest::where('id', $all[$i]->id)->update($update);
+            }
+        }
+
+    }
     public function sendTransaction(Request $request)
     {
         $data = [1000000]; //[$request->param1, $request->param2]
