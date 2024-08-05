@@ -72,6 +72,7 @@ class ContractController extends Controller
         $data = $request->get('user_id');
 
         $result = $this->web3Service->callFunction('getUserAddr', $data);
+
         if (isset($result['data']) && $result['data'] != null) {
 
             $address = UserAddress::updateOrCreate(
@@ -80,7 +81,7 @@ class ContractController extends Controller
             );
 
         }
-        return $this->jsonResponse($address, 100);
+        return 1;
 
     }
     public function getMarketPrice()
