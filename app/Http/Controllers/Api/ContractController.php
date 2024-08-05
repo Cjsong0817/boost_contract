@@ -17,15 +17,37 @@ class ContractController extends Controller
     }
     public function checkTransactionStatus($txHash)
     {
-        // Node.js 脚本的路径
+        // Sanitize the transaction hash input
+        $txHash = escapeshellarg($txHash);
+
+        // Node.js script path
         $nodeScript = base_path('node_scripts/web3Listener.js');
 
-        // 执行 Node.js 脚本并传递交易哈希
+        // Check if the Node.js script exists and is executable
+        if (!file_exists($nodeScript) || !is_executable($nodeScript)) {
+            return response()->json(['error' => "Node.js script not found or not executable: $nodeScript"], 500);
+        }
+
+        // Command to execute the Node.js script with the transaction hash
         $command = "node $nodeScript $txHash";
+
+        // For debugging: Log the command to be executed
+        \Log::debug("Executing command: $command");
+
+        // Execute the command and capture the output
         $output = shell_exec($command);
 
-        // 返回输出到前端
-        return response()->json(['output' => $output]);
+        // Check if the command execution was successful
+        if ($output === null) {
+            // Handle the error case (e.g., script failed to run)
+            return response()->json(['error' => 'Failed to execute Node.js script'], 500);
+        }
+
+        // Decode the JSON output from the Node.js script
+        $outputData = json_decode($output, true);
+
+        // Return the output to the front-end
+        return response()->json($outputData);
     }
     public function getContractData()
     {
@@ -46,12 +68,12 @@ class ContractController extends Controller
     public function getUserAddress()
     {
         $user = auth()->user();
-        $data = $user->id;
+        $data = 10000;
         $result = $this->web3Service->callFunction('getUserAddr', $data);
-        if (isset($result['data']) && $result['data'] != null && $user->id) {
+        if (isset($result['data']) && $result['data'] != null) {
 
             UserAddress::updateOrCreate(
-                ['user_id' => $user->id],
+                ['user_id' => 10000],
                 ['wallet_type' => 'polygon', 'address' => $result['data']]
             );
 
@@ -61,7 +83,12 @@ class ContractController extends Controller
     {
         //getPrice = boost value
         $data = [];
-        $result = $this->web3Service->callFunction('getPrice', $data);
+        $totalusdt = $this->web3Service->callFunction('totalUsdt', $data);
+        if (isset($totalusdt['data']) && $totalusdt['data'] != null) {
+
+            $this->set_key('USDTB_POOL', $totalusdt['data']);
+
+        }
     }
     public function sendTransaction(Request $request)
     {

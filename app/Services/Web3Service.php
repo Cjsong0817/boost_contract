@@ -39,7 +39,7 @@ class Web3Service
             if ($err !== null) {
                 throw new \Exception($err->getMessage());
             }
-
+            dump($result);
             if ($functionName == 'getPrice') {
                 $bigInteger = $result[0];
                 $weiValue = $bigInteger->toString();
