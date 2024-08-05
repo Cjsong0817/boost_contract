@@ -831,4 +831,6 @@ async function checkTransactionStatus(txHash) {
         console.error('Error fetching transaction receipt:', error);
     }
 }
-setInterval(checkTransactionStatus(txHash), 1000);
+// setInterval(, 1000);
+
+checkTransactionStatus(txHash)
