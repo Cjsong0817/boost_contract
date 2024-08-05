@@ -15,6 +15,7 @@ class ContractController extends Controller
     {
         $this->web3Service = $web3Service;
     }
+
     public function checkTransactionStatus($txHash)
     {
         // Sanitize the transaction hash input
@@ -65,19 +66,20 @@ class ContractController extends Controller
         $data = [];
         $result = $this->web3Service->callFunction('totalPledge', $data);
     }
-    public function getUserAddress()
+    public function getUserAddress(Request $request)
     {
-        $user = auth()->user();
-        $data = 10000;
+
+        $data = $request->get('user_id');
         $result = $this->web3Service->callFunction('getUserAddr', $data);
         if (isset($result['data']) && $result['data'] != null) {
 
-            UserAddress::updateOrCreate(
-                ['user_id' => 10000],
+            $address = UserAddress::updateOrCreate(
+                ['user_id' => $user->id],
                 ['wallet_type' => 'polygon', 'address' => $result['data']]
             );
 
         }
+        $this->success($address);
     }
     public function getMarketPrice()
     {
