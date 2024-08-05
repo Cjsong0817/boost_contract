@@ -31,7 +31,7 @@ class Web3Service
 
     public function callFunction($functionName, $params)
     {
-        var_dump($params);
+
         $respond['data'] = null;
         $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
 
@@ -39,7 +39,7 @@ class Web3Service
             if ($err !== null) {
                 throw new \Exception($err->getMessage());
             }
-            dump($result);
+
             if ($functionName == 'totalBoost') {
                 $bigInteger = $result[0];
                 $weiValue = $bigInteger->toString();
