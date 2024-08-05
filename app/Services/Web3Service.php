@@ -40,7 +40,23 @@ class Web3Service
                 throw new \Exception($err->getMessage());
             }
             dump($result);
-            if ($functionName == 'getPrice') {
+            if ($functionName == 'totalBoost') {
+                $bigInteger = $result[0];
+                $weiValue = $bigInteger->toString();
+                $etherArray = Utils::fromWei($weiValue, 'ether');
+                $integerPart = $etherArray[0]->toString();
+                $decimalPart = $etherArray[1]->toString();
+                $ether = $integerPart . '.' . str_pad($decimalPart, 18, '0', STR_PAD_LEFT);
+                $respond['data'] = $ether;
+            } elseif ($functionName == 'totalUsdt') {
+                $bigInteger = $result[0];
+                $weiValue = $bigInteger->toString();
+                $etherArray = Utils::fromWei($weiValue, 'ether');
+                $integerPart = $etherArray[0]->toString();
+                $decimalPart = $etherArray[1]->toString();
+                $ether = $integerPart . '.' . str_pad($decimalPart, 18, '0', STR_PAD_LEFT);
+                $respond['data'] = $ether;
+            } elseif ($functionName == 'getPrice') {
                 $bigInteger = $result[0];
                 $weiValue = $bigInteger->toString();
                 $etherArray = Utils::fromWei($weiValue, 'ether');

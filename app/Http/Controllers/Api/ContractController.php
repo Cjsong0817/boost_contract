@@ -85,9 +85,15 @@ class ContractController extends Controller
         $data = [];
         $totalusdt = $this->web3Service->callFunction('totalUsdt', $data);
         if (isset($totalusdt['data']) && $totalusdt['data'] != null) {
-
             $this->set_key('USDTB_POOL', $totalusdt['data']);
-
+        }
+        $totalBoost = $this->web3Service->callFunction('totalBoost', $data);
+        if (isset($totalBoost['data']) && $totalBoost['data'] != null) {
+            $this->set_key('BOOST_POOL', $totalBoost['data']);
+        }
+        $getPrice = $this->web3Service->callFunction('getPrice', $data);
+        if (isset($getPrice['data']) && $getPrice['data'] != null) {
+            $this->set_key('BOOST_PRICE', $getPrice['data']);
         }
     }
     public function sendTransaction(Request $request)
