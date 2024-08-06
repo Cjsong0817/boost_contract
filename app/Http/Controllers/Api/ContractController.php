@@ -102,6 +102,12 @@ class ContractController extends Controller
             $this->set_key('BOOST_PRICE', $getPrice['data']);
         }
     }
+    public function autorizeUser(Request $request)
+    {
+        $sent['user_id'] = $request->get('user_id');
+        $result = $this->web3Service->sendTransaction('create', $sent);
+        return response()->json($result);
+    }
     public function systemPledge(Request $request)
     {
         $all = UserInvest::where('tx_id', null)->get();
@@ -112,8 +118,9 @@ class ContractController extends Controller
             $result = $this->web3Service->sendTransaction('systemPledge', $sent);
             if ($result['status']) {
                 $update['tx_id'] = $result['data'];
-                $update['status'] = 1;
+                $update['coin_sent'] = 1;
                 UserInvest::where('id', $all[$i]->id)->update($update);
+                $this->getMarketPrice();
             }
         }
 

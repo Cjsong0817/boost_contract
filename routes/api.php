@@ -21,6 +21,7 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('/checkTransaction/{txHash}', [ContractController::class, 'checkTransactionStatus']);
     Route::get('getUserAddress', [ContractController::class, 'getUserAddress']);
     Route::get('getMarketPrice', [ContractController::class, 'getMarketPrice']);
+    Route::get('autorizeUser', [ContractController::class, 'autorizeUser']);
     Route::get('systemPledge', [ContractController::class, 'systemPledge']);
 });
 // Protected routes
