@@ -85,7 +85,7 @@ class Web3Service
 
         $data = $this->getData($functionName, $sent);
 
-        dump($data);
+        // dump($data);
         $cb = new Callback();
         $cb1 = new Callback();
         $from = $this->owner_address;
@@ -104,21 +104,21 @@ class Web3Service
         // $trans['chainId'] = $this->chain['chain_id'];
         $respond['status'] = false;
         $respond['data'] = null;
-        print_r($trans);
+
         $transaction = new Tx($trans);
         $signTransaction = $transaction->sign($this->privateKey);
-        echo "\r\n $signTransaction \r\n";
+        //  echo "\r\n $signTransaction \r\n";
         sleep(2);
         try {
 
             $this->contract->at($contractAddress)->getEth()->sendRawTransaction("0x" . $signTransaction, $cb1);
             $respond['status'] = true;
             $respond['data'] = $cb1->result;
-            echo "TxID: $cb1->result \r\n";
+            //  echo "TxID: $cb1->result \r\n";
 
-            dump($this->contract);
-            dump($cb1);
-            echo "Transction Hash: \$cb1->result > " . $cb1->result . "\r\n";
+            //    dump($this->contract);
+            // dump($cb1);
+            // echo "Transction Hash: \$cb1->result > " . $cb1->result . "\r\n";
         } catch (Exception $e) {
             dump($e->getMessage());
         }

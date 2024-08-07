@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helper\CryptedPay;
+use App\Models\BoostTotal;
 use App\Models\GlobalCountry;
 use App\Models\Role;
 use App\Models\Uall;
@@ -175,6 +176,13 @@ class User extends Authenticatable implements JWTSubject
 
         return Uall::where('user_id', $user_id)->where($line, 'like', "%" . $this->id . "%")->first();
 
+    }
+    public function getBoostInfo()
+    {
+        $total = BoostTotal::firstOrCreate(
+            ['user_id' => $this->id]
+        );
+        return $total;
     }
     public function getWallet()
     {
