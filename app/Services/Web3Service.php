@@ -74,10 +74,10 @@ class Web3Service
     {
         $contractAddress = '0xEF05CC5Bf045d1876A0bd9e43784c62143c32DcF';
         if ($functionName == 'systemPledge') {
-            $ether = (string) $params['amount'];
-            $wei = Utils::toWei($ether, 'ether');
+            // $ether = (string) $params['amount'];
+            // $wei = Utils::toWei($ether, 'ether');
             $this->contract->at($contractAddress);
-            $sent = [$params['user_id'], $ether]; // 示例数据
+            $sent = [$params['user_id'], $params['amount']]; // 示例数据
         } elseif ($functionName == 'create') {
 
             $sent = [$params['user_id']]; // 示例数据
