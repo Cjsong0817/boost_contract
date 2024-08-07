@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\CoinRecord;
 use App\Models\UserAddress;
 use App\Models\UserInvest;
 use App\Services\Web3Service;
@@ -49,7 +50,7 @@ class ContractController extends Controller
         $outputData = json_decode($output, true);
 
         // Return the output to the front-end
-        return response()->json($outputData);
+        return $outputData;
     }
     public function getContractData()
     {
@@ -109,6 +110,36 @@ class ContractController extends Controller
         return response()->json($result);
     }
     public function systemPledge(Request $request)
+    {
+        $all = UserInvest::where('tx_id', '!=', null)->get();
+        for ($i = 0; $i < count($all); $i++) {
+            $sent['user_id'] = $all[$i]->user_id;
+            $sent['amount'] = $all[$i]->price;
+            $boostinfo = $all[$i]->user->getBoostInfo();
+            dump($boostinfo->id);
+            $record = $this->checkTransactionStatus($all[$i]->tx_id);
+            dump($record);
+            if (isset($record['pledgeAmt'])) {
+                $pledgeU = $record['uBalance'] - $boostinfo->utotal;
+                $pledgeB = $record['bBalance'] - $boostinfo->btotal;
+                $pledgeAmount = $record['pledgeAmt'] + $boostinfo->total_pledge;
+                $coinrecord['price'] = $record['pledgeAmt'];
+                $coinrecord['user_id'] = $all[$i]->user_id;
+                $coinrecord['user_invest_id'] = $all[$i]->id;
+                $coinrecord['coin_price'] = 1;
+                $coinrecord['total_amount'] = $pledgeB;
+                $coinrecord['record_type'] = 1;
+                CoinRecord::create($coinrecord);
+                $boostinfo->utotal = $record['uBalance'];
+                $boostinfo->btotal = $record['bBalance'];
+                $boostinfo->btotal = $record['pledgeAmt'];
+                $boostinfo->save();
+            }
+
+        }
+
+    }
+    public function systemPledgeback(Request $request)
     {
         $all = UserInvest::where('tx_id', null)->get();
         for ($i = 0; $i < count($all); $i++) {
