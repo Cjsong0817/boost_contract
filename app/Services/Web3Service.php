@@ -77,7 +77,7 @@ class Web3Service
             $ether = (string) $params['amount'];
             $wei = Utils::toWei($ether, 'ether');
             $this->contract->at($contractAddress);
-            $sent = [$params['user_id'], $wei]; // 示例数据
+            $sent = [$params['user_id'], $ether]; // 示例数据
         } elseif ($functionName == 'create') {
 
             $sent = [$params['user_id']]; // 示例数据

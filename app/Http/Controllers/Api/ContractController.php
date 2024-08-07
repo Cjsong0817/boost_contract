@@ -109,7 +109,7 @@ class ContractController extends Controller
         $result = $this->web3Service->sendTransaction('create', $sent);
         return response()->json($result);
     }
-    public function systemPledge(Request $request)
+    public function systemPledges(Request $request)
     {
         $all = UserInvest::where('tx_id', '!=', null)->get();
         for ($i = 0; $i < count($all); $i++) {
@@ -118,28 +118,29 @@ class ContractController extends Controller
             $boostinfo = $all[$i]->user->getBoostInfo();
             dump($boostinfo->id);
             $record = $this->checkTransactionStatus($all[$i]->tx_id);
-            dump($record);
+
             if (isset($record['pledgeAmt'])) {
-                $pledgeU = $record['uBalance'] - $boostinfo->utotal;
-                $pledgeB = $record['bBalance'] - $boostinfo->btotal;
-                $pledgeAmount = $record['pledgeAmt'] + $boostinfo->total_pledge;
-                $coinrecord['price'] = $record['pledgeAmt'];
+
+                $pledgeU = hexdec($record['uBalance']) - $boostinfo->utotal;
+                $pledgeB = hexdec($record['bBalance']) - $boostinfo->btotal;
+                $pledgeAmount = hexdec($record['pledgeAmt']) + $boostinfo->total_pledge;
+                $coinrecord['price'] = hexdec($record['pledgeAmt']);
                 $coinrecord['user_id'] = $all[$i]->user_id;
                 $coinrecord['user_invest_id'] = $all[$i]->id;
                 $coinrecord['coin_price'] = 1;
                 $coinrecord['total_amount'] = $pledgeB;
                 $coinrecord['record_type'] = 1;
                 CoinRecord::create($coinrecord);
-                $boostinfo->utotal = $record['uBalance'];
-                $boostinfo->btotal = $record['bBalance'];
-                $boostinfo->btotal = $record['pledgeAmt'];
+                $boostinfo->utotal = hexdec($record['uBalance']);
+                $boostinfo->btotal = hexdec($record['bBalance']);
+                $boostinfo->btotal = hexdec($record['pledgeAmt']);
                 $boostinfo->save();
             }
-
+            exit;
         }
 
     }
-    public function systemPledgeback(Request $request)
+    public function systemPledge(Request $request)
     {
         $all = UserInvest::where('tx_id', null)->get();
         for ($i = 0; $i < count($all); $i++) {
